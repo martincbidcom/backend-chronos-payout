@@ -4,13 +4,18 @@ import { readFileSync } from 'fs';
 import * as https from 'https';
 import { DoRequestDto } from 'src/common/dto/bind.dto';
 import { BindRequestInterface } from 'src/common/interfaces/bind.interface';
+import { ProcessLog } from 'src/common/utils/enum';
+import { TempLogService } from 'src/temp-log/temp-log.service';
 
 @Injectable()
 export class BindService {
   private httpsAgent: https.Agent;
-  constructor() {}
+  private token: string;
+  private timeTokenExpirate: Date;
 
-  public async requestLogin() {
+  constructor(private tempLogService: TempLogService) {}
+
+  async requestLogin() {
     try {
       const data = {
         username: process.env.USERNAME_BIND,
@@ -34,13 +39,50 @@ export class BindService {
 
       const response = await axios(config);
 
-      return response.data;
+      const timeExpire = new Date(
+        new Date().getTime() + response.data.expires_in * 1000,
+      );
+
+      this.timeTokenExpirate = timeExpire;
+
+      this.token = response.data.token;
+
+      return { create_token: response.data.token };
     } catch (error) {
-      console.log(error);
+      await this.tempLogService.saveTempLog({
+        process: ProcessLog.BIND,
+        method: 'requestLogin => Obtencion de token',
+        description:
+          'Error en la optencion de token' +
+          JSON.stringify(error?.response?.data ?? error?.response),
+      });
+
       throw new Error('Error en autenticacion de BIND.');
     }
   }
 
+  async checkTokenAndReconnect(expirationDate: Date) {
+    const currentTime = new Date().getTime();
+    const expirationTime = expirationDate.getTime();
+    const oneMinuteInMillis = 60 * 1000;
+
+    if (expirationTime - currentTime <= oneMinuteInMillis) {
+      await this.tempLogService.saveTempLog({
+        process: ProcessLog.BIND,
+        method: 'checkTokenAndReconnect => tiempo de expiracion ',
+        description: 'token Vencido',
+      });
+      await this.requestLogin();
+    }
+  }
+
+  async getToken() {
+    if (!this.token) {
+      return await this.requestLogin();
+    }
+    await this.checkTokenAndReconnect(this.timeTokenExpirate);
+    return this.token;
+  }
   /**
    * Executes a transaction to the specified destination using the specified parameters.
    *
