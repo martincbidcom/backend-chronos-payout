@@ -3,7 +3,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 import { readFileSync } from 'fs';
 import * as https from 'https';
 import { DoRequestDto } from 'src/common/dto/bind.dto';
-import { BindRequestDto } from 'src/common/interfaces/bind.interface';
+import { BindRequestInterface } from 'src/common/interfaces/bind.interface';
 
 @Injectable()
 export class BindService {
@@ -55,7 +55,7 @@ export class BindService {
     try {
       const { destinationCbu, amount, concept, origin_id, origin_debit_cvu } =
         body;
-      const params: BindRequestDto = {
+      const params: BindRequestInterface = {
         to: {
           cbu: destinationCbu,
         },

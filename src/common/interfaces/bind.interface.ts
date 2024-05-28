@@ -1,4 +1,4 @@
-export interface BindRequestDto {
+export interface BindRequestInterface {
   to?: {
     cbu: string;
   };
