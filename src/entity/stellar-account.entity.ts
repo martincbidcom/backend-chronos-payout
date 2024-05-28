@@ -5,8 +5,8 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-@Entity({name: 'stellar_accounts'})
-export class StellaAccountEntity {
+@Entity({ name: 'stellar_accounts' })
+export class StellarAccountEntity {
   @PrimaryGeneratedColumn()
   id?: string;
 

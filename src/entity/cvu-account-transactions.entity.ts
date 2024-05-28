@@ -5,7 +5,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-@Entity({name: 'cvu_account_transactions'})
+@Entity({ name: 'cvu_account_transactions' })
 export class CvuAccountTransactionsEntity {
   @PrimaryGeneratedColumn()
   id?: string;

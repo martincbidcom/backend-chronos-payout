@@ -5,11 +5,14 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-@Entity({ name: 'stellar_account_transactions' })
-export class StellarAccountTransactionsEntity {
+@Entity({ name: 'user_roles' })
+export class UserRolesEntity {
   @PrimaryGeneratedColumn()
   id?: string;
 
   @Column()
-  stellar_account_transaction_id: number;
+  role: string;
+
+  @Column()
+  user_id: number;
 }
