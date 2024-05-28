@@ -30,7 +30,8 @@ export class TransactionController {
             return {
                 statusCode: HttpStatus.ACCEPTED,
                 message: 'send Transaction',
-                data: await this.transactionService.sendTransaction(payload)
+                data: await this.bindService.getTransaction()
+                // data: await this.transactionService.sendTransaction(payload)
             };
         } catch (error) {
             throw new HttpException(error?.message, HttpStatus.BAD_REQUEST);

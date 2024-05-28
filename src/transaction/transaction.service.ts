@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { response } from 'express';
 import { BindService } from 'src/bind/bind.service';
 import { ProcessLog, StatusTransaction } from 'src/common/utils/enum';
 import { Transacction } from 'src/entity/transsaction.entity';
@@ -60,6 +61,8 @@ export class TransactionService {
 
             throw new Error('Falla al guardar la respuesta de BIND')
         }
+
+        transaction['responseBind'] = sendTransaction
 
         return transaction
     }

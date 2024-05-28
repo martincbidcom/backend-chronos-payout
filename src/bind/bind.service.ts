@@ -146,4 +146,19 @@ export class BindService {
     async generateBindTransactionOriginID(transactionId: string | number) {
         return `CHR${transactionId.toString().padStart(10, '0')}`;
     }
+
+    async getTransaction(){
+        try {
+            const headers = {
+                Authorization: `JWT ${await this.getToken()}`
+            }
+            const response = await axios.get(`${this.URL}/banks/${this.BANK_ID}/accounts/${this.ACCOUNT_ID}/${this.VIEW_ID}/transaction-request-types/TRANSFER`, {
+                headers
+            })
+
+            return response.data
+        } catch (error) {
+            throw new Error(error?.response?.data?.message)
+        }
+    }
 }
