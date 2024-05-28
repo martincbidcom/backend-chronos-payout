@@ -11,4 +11,9 @@ export class DoRequestDto {
   @IsNumber()
   @IsNotEmpty()
   amount: number;
+
+  @ApiProperty()
+  @IsNumber()
+  @IsNotEmpty()
+  idTransaction: number;
 }

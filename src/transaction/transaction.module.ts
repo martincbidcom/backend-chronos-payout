@@ -7,6 +7,7 @@ import { BindModule } from 'src/bind/bind.module';
 import { StellaAccountTransactionsEntity } from 'src/entity/stellar-account-transactions.entity';
 import { CvuAccountTransactionsEntity } from 'src/entity/cvu-account-transactions.entity';
 import { StellaAccountEntity } from 'src/entity/stellar-account.entity';
+import { TempLogModule } from 'src/temp-log/temp-log.module';
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import { StellaAccountEntity } from 'src/entity/stellar-account.entity';
       CvuAccountTransactionsEntity,
       StellaAccountEntity
     ]),
-    BindModule
+    BindModule,
+    TempLogModule
   ],
   providers: [TransactionService],
   exports: [TransactionService],

@@ -3,18 +3,23 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CvuAccountTransactionsEntity } from 'src/entity/cvu-account-transactions.entity';
 import { StellaAccountTransactionsEntity } from 'src/entity/stellar-account-transactions.entity';
 import { StellaAccountEntity } from 'src/entity/stellar-account.entity';
+import { BindService } from 'src/bind/bind.service';
+import { ProcessLog, StatusTransaction } from 'src/common/utils/enum';
 import { Transacction } from 'src/entity/transsaction.entity';
+import { TempLogService } from 'src/temp-log/temp-log.service';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class TransactionService {
-  constructor(
-    @InjectRepository(Transacction)
-    private _transacctionRepository: Repository<Transacction>,
-    private _stellaAccountTransactionsRepository: Repository<StellaAccountTransactionsEntity>,
-    private _cvuAccountTransactionsEntity: Repository<CvuAccountTransactionsEntity>,
-    private _stellaAccountRepository: Repository<StellaAccountEntity>,
-  ) {}
+    constructor(
+        @InjectRepository(Transacction)
+        private _transacctionRepository: Repository<Transacction>,
+        private bindService: BindService,
+        private tempLogService: TempLogService,
+        private _stellaAccountTransactionsRepository: Repository<StellaAccountTransactionsEntity>,
+        private _cvuAccountTransactionsEntity: Repository<CvuAccountTransactionsEntity>,
+        private _stellaAccountRepository: Repository<StellaAccountEntity>,
+    ) { }
 
   async create(transacction: Transacction) {
     const createTransacction =
@@ -210,22 +215,23 @@ export class TransactionService {
       );
     }
 
-    if (transaction.account_transaction_type === 'cvu') {
-      const cvuAccountTransaction =
-        await this.getTransactionForCVUTransactionId(
-          transaction.account_transaction_id,
-        );
-      transaction.cbu = { chronos_transaction: cvuAccountTransaction };
-      if (cvuAccountTransaction) {
-        const bindCVUTransaction = await this.getBINDCVUAccountTransaction(
-          cvuAccountTransaction.bind_transaction_id,
-        );
-        transaction.cbu.bind_transaction = bindCVUTransaction;
-      }
-    }
+    // if (transaction.account_transaction_type === 'cvu') {
+    //   const cvuAccountTransaction =
+    //     await this.getTransactionForCVUTransactionId(
+    //       transaction.account_transaction_id,
+    //     );
+    //   transaction.cbu = { chronos_transaction: cvuAccountTransaction };
+    //   if (cvuAccountTransaction) {
+    //     const bindCVUTransaction = await this.getBINDCVUAccountTransaction(
+    //       cvuAccountTransaction.bind_transaction_id,
+    //     );
+    //     transaction.cbu.bind_transaction = bindCVUTransaction;
+    //   }
+    // }
 
     let counterparty_transaction;
-    const base_user_account = await this.getCVUAccountForStellarBase();
+    const base_user_account = null;
+    // await this.getCVUAccountForStellarBase();
     if (transaction.user_id != base_user_account.user_id) {
       counterparty_transaction = transaction.cvu_stellar_transaction;
     }
@@ -235,15 +241,15 @@ export class TransactionService {
 
     let summary;
 
-    if (counterparty_transaction != null) {
-      summary = this.getTransactionSummaryFromRelated(
-        transaction,
-        counterparty_transaction,
-      );
-    } else {
-      // Si pasa por aca es porque es una transaccion que no tiene transacciones relacionadas
-      summary = this.getTransactionSummaryFrom(transaction);
-    }
+    // if (counterparty_transaction != null) {
+    //   summary = this.getTransactionSummaryFromRelated(
+    //     transaction,
+    //     counterparty_transaction,
+    //   );
+    // } else {
+    //   // Si pasa por aca es porque es una transaccion que no tiene transacciones relacionadas
+    //   summary = this.getTransactionSummaryFrom(transaction);
+    // }
 
     transaction.summary = summary;
 
@@ -328,4 +334,39 @@ export class TransactionService {
     }
     return null;
   }
+    async sendTransaction(payload: any) {
+
+        const transaction = await this.create({
+            amountFiat: payload.amount,
+            status: StatusTransaction.CREATED,
+            referenceId: payload.reference,
+            cvuDestination: payload.cvu
+        });
+
+        if (!transaction) throw new Error('Falla al registrar la transaccion')
+
+        const sendTransaction = await this.bindService.doTransaction({
+            destinationCbu: payload.cvu,
+            amount: payload.amount,
+            idTransaction: Number(transaction.id)
+        })
+
+        const updateTransaction = await this.update(transaction.id, {
+            responseBind: JSON.stringify('sendTransaction'),
+            status: StatusTransaction.SENT
+        })
+
+        if (updateTransaction.affected === 0) {
+            await this.tempLogService.saveTempLog({
+                process: ProcessLog.TRANSACTION,
+                method: 'sendTransaction => no se pudo actualizar transaccion',
+                description:
+                    `idTransaction = ${transaction.id}, status = ${StatusTransaction.SENT}, response = ${'sendTransaction'}`,
+            });
+
+            throw new Error('Falla al guardar la respuesta de BIND')
+        }
+
+        return transaction
+    }
 }

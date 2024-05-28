@@ -110,7 +110,7 @@ export class BindService {
                     amount: amount.toFixed(2),
                 },
                 concept: 'VAR',
-                origin_id: await this.generateBindTransactionOriginID(10002),
+                origin_id: await this.generateBindTransactionOriginID(body.idTransaction),
                 origin_debit: {
                     cvu: process.env.CVU_DEBITO_BIND,
                 },
