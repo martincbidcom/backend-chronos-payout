@@ -5,7 +5,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-@Entity()
+@Entity({ name: 'transactions' })
 export class Transacction {
   @PrimaryGeneratedColumn()
   id?: string;
@@ -13,19 +13,19 @@ export class Transacction {
   @Column('decimal', { precision: 20, scale: 10, default: 0 })
   amountFiat: number;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   referenceId: string;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   status: string;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   idCoelsa?: string;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   cvuDestination: string;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   responseBind?: string;
 
   @CreateDateColumn({
@@ -39,6 +39,9 @@ export class Transacction {
     default: () => 'CURRENT_TIMESTAMP',
   })
   updateAt?: Date;
+
+  @Column({ default: 'cvu' })
+  account_transaction_type?: string;
 
   constructor(partial: Partial<Transacction>) {
     Object.assign(this, partial);
