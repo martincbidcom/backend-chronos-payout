@@ -19,11 +19,26 @@ export class Transacction {
   @Column({nullable: true})
   status: string;
 
+  @Column({nullable: true})
+  idCoelsa?: string;
+
+  @Column({nullable: true})
+  cvuDestination: string;
+
+  @Column({nullable: true})
+  responseBind?: string;
+
   @CreateDateColumn({
     type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
   })
   createdAt?: Date;
+
+  @CreateDateColumn({
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  updateAt?: Date;
 
   constructor(partial: Partial<Transacction>) {
     Object.assign(this, partial);

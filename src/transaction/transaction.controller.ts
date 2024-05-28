@@ -1,4 +1,4 @@
-import { Controller, Get, HttpException, HttpStatus } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Post } from '@nestjs/common';
 import { BindService } from 'src/bind/bind.service';
 import { DefaultResponsesDto, ErrorResponseDto } from 'src/common/dto/response.dto';
 
@@ -20,13 +20,13 @@ export class TransactionController {
         }
     }
 
-    @Get('send')
-    async sendTransaction(): Promise<DefaultResponsesDto | ErrorResponseDto> {
+    @Post('send')
+    async sendTransaction( @Body() payload: any): Promise<DefaultResponsesDto | ErrorResponseDto> {
         try {
             return {
                 statusCode: HttpStatus.ACCEPTED,
-                message: 'Token',
-                data: await this.bindService.requestLogin()
+                message: 'send Transaction',
+                data: await this.bindService.doTransaction(payload)
             };
         } catch (error) {
             throw new HttpException(error?.message, HttpStatus.BAD_REQUEST);
