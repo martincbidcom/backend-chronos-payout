@@ -26,7 +26,8 @@ import { TempLogModule } from './temp-log/temp-log.module';
     AuthModule,
     BindModule,
     TransactionModule,
-    TempLogModule
+    TempLogModule,
+    BindModule
   ],
   controllers: [AppController],
   providers: [AppService],
