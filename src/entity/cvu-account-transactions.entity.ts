@@ -12,4 +12,7 @@ export class CvuAccountTransactionsEntity {
 
   @Column()
   cvu_account_transaction_id: number;
+
+  @Column()
+  bind_transaction_id: string;
 }
