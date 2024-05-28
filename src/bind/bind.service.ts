@@ -76,7 +76,7 @@ export class BindService {
       const bank_id: number = 322;
       const account_id: string = '20-1-685741-1-5';
       const view_id: string = 'OWNER';
-      const url: string = `/banks/${bank_id}/accounts/${account_id}/${view_id}/transaction-request-types/TRANSFER-CVU/transaction-requests`;
+      const url: string = `https://api.bind.com.ar/v1/banks/${bank_id}/accounts/${account_id}/${view_id}/transaction-request-types/TRANSFER-CVU/transaction-requests`;
       const config: AxiosRequestConfig = {
         method: 'POST',
         url,
