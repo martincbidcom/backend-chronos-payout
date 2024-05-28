@@ -41,7 +41,8 @@ export class TransactionService {
 
         const sendTransaction = await this.bindService.doTransaction({
             destinationCbu: payload.cvu,
-            amount: payload.amount
+            amount: payload.amount,
+            idTransaction: Number(transaction.id)
         })
 
         const updateTransaction = await this.update(transaction.id, {
