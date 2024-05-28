@@ -13,6 +13,7 @@ import {
 } from 'src/common/dto/response.dto';
 import { TransactionService } from './transaction.service';
 import { ApiTags } from '@nestjs/swagger';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @ApiTags('Transaction')
 @Controller('transaction')
@@ -51,6 +52,7 @@ export class TransactionController {
   }
 
   @Get('get-transaction')
+  @Cron(CronExpression.EVERY_10_HOURS)
   async getPendingTransactions() {
     try {
       return {
