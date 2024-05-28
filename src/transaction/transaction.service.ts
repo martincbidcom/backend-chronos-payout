@@ -45,7 +45,7 @@ export class TransactionService {
         })
 
         const updateTransaction = await this.update(transaction.id, {
-            responseBind: JSON.stringify(sendTransaction),
+            responseBind: JSON.stringify('sendTransaction'),
             status: StatusTransaction.SENT
         })
 
@@ -54,7 +54,7 @@ export class TransactionService {
                 process: ProcessLog.TRANSACTION,
                 method: 'sendTransaction => no se pudo actualizar transaccion',
                 description:
-                    `idTransaction = ${transaction.id}, status = ${StatusTransaction.SENT}, response = ${sendTransaction}`,
+                    `idTransaction = ${transaction.id}, status = ${StatusTransaction.SENT}, response = ${'sendTransaction'}`,
             });
 
             throw new Error('Falla al guardar la respuesta de BIND')
