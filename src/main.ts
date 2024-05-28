@@ -30,7 +30,7 @@ async function bootstrap() {
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, document);
+  SwaggerModule.setup(globalPrefix, app, document);
 
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   app.use(express.json({ limit: '20mb' }));

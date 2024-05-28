@@ -19,4 +19,17 @@ export class TransactionController {
             throw new HttpException(error?.message, HttpStatus.BAD_REQUEST);
         }
     }
+
+    @Get('send')
+    async sendTransaction(): Promise<DefaultResponsesDto | ErrorResponseDto> {
+        try {
+            return {
+                statusCode: HttpStatus.ACCEPTED,
+                message: 'Token',
+                data: await this.bindService.requestLogin()
+            };
+        } catch (error) {
+            throw new HttpException(error?.message, HttpStatus.BAD_REQUEST);
+        }
+    }
 }

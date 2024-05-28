@@ -7,17 +7,17 @@ import {
 
 @Entity()
 export class Transacction {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn()
   id?: string;
 
   @Column('decimal', { precision: 20, scale: 10, default: 0 })
   amountFiat: number;
 
   @Column({nullable: true})
-  description: string;
+  referenceId: string;
 
-  @Column()
-  message: string;
+  @Column({nullable: true})
+  status: string;
 
   @CreateDateColumn({
     type: 'timestamptz',

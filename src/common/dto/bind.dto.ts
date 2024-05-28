@@ -11,21 +11,4 @@ export class DoRequestDto {
   @IsNumber()
   @IsNotEmpty()
   amount: number;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  concept: string;
-
-  @ApiProperty()
-  @IsOptional()
-  @IsString()
-  @IsNotEmpty()
-  origin_id?: string;
-
-  @ApiProperty()
-  @IsOptional()
-  @IsString()
-  @IsNotEmpty()
-  origin_debit_cvu?: string;
 }
