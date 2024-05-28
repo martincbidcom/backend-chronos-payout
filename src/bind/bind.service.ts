@@ -152,7 +152,7 @@ export class BindService {
             const headers = {
                 Authorization: `JWT ${await this.getToken()}`
             }
-            const response = await axios.get(`${this.URL}/banks/${this.BANK_ID}/accounts/${this.ACCOUNT_ID}/${this.VIEW_ID}/transaction-request-types/TRANSFER`, {
+            const response = await axios.get(`${this.URL}/banks/${this.BANK_ID}/accounts/${this.ACCOUNT_ID}/${this.VIEW_ID}/transaction-request-types/TRANSFER-CVU`, {
                 headers
             })
 
