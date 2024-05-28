@@ -52,41 +52,43 @@ export class BindService {
    * @returns A promise that resolves to the response from the BIND API.
    */
   async doTransaction(body: DoRequestDto) {
-    const {
-      destinationCbu,
-      amount,
-      concept,
-      origin_id,
-      origin_debit_cvu,
-    } = body;
-    const params: BindRequestDto = {
-      to: {
-        cbu: destinationCbu,
-      },
-      value: {
-        currency: 'ARS',
-        amount: amount.toFixed(2),
-      },
-      concept,
-    };
-
-    if (origin_id && origin_debit_cvu) {
-      params.origin_id = origin_id;
-      params.origin_debit = {
-        cvu: origin_debit_cvu,
+    try {
+      const { destinationCbu, amount, concept, origin_id, origin_debit_cvu } =
+        body;
+      const params: BindRequestDto = {
+        to: {
+          cbu: destinationCbu,
+        },
+        value: {
+          currency: 'ARS',
+          amount: amount.toFixed(2),
+        },
+        concept,
       };
-    }
 
-    const bank_id: number = 322;
-    const account_id: string = '20-1-685741-1-5';
-    const view_id: string = 'OWNER';
-    const url: string = `/banks/${bank_id}/accounts/${account_id}/${view_id}/transaction-request-types/TRANSFER-CVU/transaction-requests`;
-    const config: AxiosRequestConfig = {
-      method: 'POST',
-      url,
-      data: params,
-    };
-    // We set the timeout to 0 to always wait for the BIND API response.
-    return await axios(config);
+      if (origin_id && origin_debit_cvu) {
+        params.origin_id = origin_id;
+        params.origin_debit = {
+          cvu: origin_debit_cvu,
+        };
+      }
+
+      const bank_id: number = 322;
+      const account_id: string = '20-1-685741-1-5';
+      const view_id: string = 'OWNER';
+      const url: string = `/banks/${bank_id}/accounts/${account_id}/${view_id}/transaction-request-types/TRANSFER-CVU/transaction-requests`;
+      const config: AxiosRequestConfig = {
+        method: 'POST',
+        url,
+        data: params,
+      };
+      // We set the timeout to 0 to always wait for the BIND API response.
+      const response = await axios(config);
+
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      throw new Error('Error en aplicar la transacción al BIND.');
+    }
   }
 }
