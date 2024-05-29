@@ -8,6 +8,8 @@ import { AuthModule } from './auth/auth.module';
 import { BindModule } from './bind/bind.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { TempLogModule } from './temp-log/temp-log.module';
+import { ScheduleConfigurationModule } from './schedule-configuration/schedule-configuration.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -24,10 +26,12 @@ import { TempLogModule } from './temp-log/temp-log.module';
     }),
     DatabaseModule,
     AuthModule,
+    ScheduleModule.forRoot(),
     BindModule,
     TransactionModule,
     TempLogModule,
-    BindModule
+    BindModule,
+    ScheduleConfigurationModule
   ],
   controllers: [AppController],
   providers: [AppService],

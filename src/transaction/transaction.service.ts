@@ -1,19 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CvuAccountTransactionsEntity } from 'src/entity/cvu-account-transactions.entity';
-import { StellarAccountTransactionsEntity } from 'src/entity/stellar-account-transactions.entity';
-import { StellarAccountEntity } from 'src/entity/stellar-account.entity';
 import { BindService } from 'src/bind/bind.service';
 import { ProcessLog, StatusTransaction } from 'src/common/utils/enum';
-import { Transacction } from 'src/entity/transsaction.entity';
+import { Transacctions } from 'src/entity/transsaction.entity';
 import { TempLogService } from 'src/temp-log/temp-log.service';
-import { Repository } from 'typeorm';
-import { BindCvuAccountsTransactionsEntity } from 'src/entity/bind-cvu-accounts-transactions.entity';
-import { UserRolesEntity } from 'src/entity/user-roles.entity';
-import { CvuAccountsEntity } from 'src/entity/cvu-accounts.entity';
-import { CounterpartyLocalTransactionsEntity } from 'src/entity/counterparty-local-transactions.entity';
-import { CounterpartyStellarTransactionsEntity } from 'src/entity/counterparty-stellar-transactions.entity';
-import { CounterpartyCbuTransactionsEntity } from 'src/entity/counterparty_cbu_transactions.entity';
+import { In, Repository } from 'typeorm';
 import axios from 'axios';
 
 @Injectable()
@@ -23,13 +14,13 @@ export class TransactionService {
   private ACCOUNT_ID = process.env.ACCOUNT_ID_BIND;
   private VIEW_ID = process.env.VIEW_ID_BIND;
   constructor(
-    @InjectRepository(Transacction)
-    private _transacctionRepository: Repository<Transacction>,
+    @InjectRepository(Transacctions)
+    private _transacctionRepository: Repository<Transacctions>,
     private bindService: BindService,
     private tempLogService: TempLogService,
   ) {}
 
-  async create(transacction: Transacction) {
+  async create(transacction: Transacctions) {
     const createTransacction =
       this._transacctionRepository.create(transacction);
     return await this._transacctionRepository.save(createTransacction);
@@ -51,160 +42,45 @@ export class TransactionService {
    */
   async getPendingTransactions() {
     const transactions = [];
-    let data = await this._transacctionRepository
-      .createQueryBuilder('transaction')
-      .where('transaction.status IN (:...statuses)', {
-        statuses: ['IN_PROGRESS', 'IN_BIND_PROGRESS', 'BIND_COMPLETED'],
-      })
-      .andWhere('transaction.account_transaction_type = :type', {
-        type: 'cvu',
-      })
-      .getRawMany();
-    data = [
-      {
-        transaction_id: '66479',
-        account_transaction_id: '63976',
+    const dataTransactions = await this._transacctionRepository.find({
+      where: {
+        status: In(['IN_PROGRESS', 'IN_BIND_PROGRESS', 'BIND_COMPLETED']),
         account_transaction_type: 'cvu',
-        transaction_type: 'send',
-        counterparty_transaction_id: '36502',
-        counterparty_transaction_type: 'cvu-external',
-        datetime: '2024-05-28 19:22:42',
-        related_transaction_id: null,
-        cvu_stellar_transaction_id: null,
-        is_consolidated: '0',
-        user_id: '3453',
-        status: 'IN_PROGRESS',
-        uitoken: 'd3b74c8d-4100-4cb1-b701-fb45c4aec2f2',
-        related_payment_request_payment_id: null,
       },
-      {
-        transaction_id: '66478',
-        account_transaction_id: '63975',
-        account_transaction_type: 'cvu',
-        transaction_type: 'send',
-        counterparty_transaction_id: '36501',
-        counterparty_transaction_type: 'cvu-external',
-        datetime: '2024-05-28 19:22:36',
-        related_transaction_id: null,
-        cvu_stellar_transaction_id: null,
-        is_consolidated: '0',
-        user_id: '3453',
-        status: 'IN_BIND_PROGRESS',
-        uitoken: 'd464bc98-20aa-48d0-8b95-4ef824c9680b',
-        related_payment_request_payment_id: null,
-      },
-      {
-        transaction_id: '66477',
-        account_transaction_id: '63974',
-        account_transaction_type: 'cvu',
-        transaction_type: 'send',
-        counterparty_transaction_id: '36500',
-        counterparty_transaction_type: 'cvu-external',
-        datetime: '2024-05-28 19:22:29',
-        related_transaction_id: null,
-        cvu_stellar_transaction_id: null,
-        is_consolidated: '0',
-        user_id: '3453',
-        status: 'IN_BIND_PROGRESS',
-        uitoken: 'ff277d0a-f616-4e18-837a-ce79be7f5c20',
-        related_payment_request_payment_id: null,
-      },
-      {
-        transaction_id: '66476',
-        account_transaction_id: '63973',
-        account_transaction_type: 'cvu',
-        transaction_type: 'send',
-        counterparty_transaction_id: '36499',
-        counterparty_transaction_type: 'cvu-external',
-        datetime: '2024-05-28 19:22:21',
-        related_transaction_id: null,
-        cvu_stellar_transaction_id: null,
-        is_consolidated: '0',
-        user_id: '3453',
-        status: 'IN_BIND_PROGRESS',
-        uitoken: '7ef810db-6099-4c6f-819e-d14dbdd62f5f',
-        related_payment_request_payment_id: null,
-      },
-      {
-        transaction_id: '66475',
-        account_transaction_id: '63972',
-        account_transaction_type: 'cvu',
-        transaction_type: 'send',
-        counterparty_transaction_id: '36498',
-        counterparty_transaction_type: 'cvu-external',
-        datetime: '2024-05-28 19:22:13',
-        related_transaction_id: null,
-        cvu_stellar_transaction_id: null,
-        is_consolidated: '0',
-        user_id: '3453',
-        status: 'IN_BIND_PROGRESS',
-        uitoken: '1003e995-0d40-446e-b6d7-82c1070f91bd',
-        related_payment_request_payment_id: null,
-      },
-      {
-        transaction_id: '66474',
-        account_transaction_id: '63971',
-        account_transaction_type: 'cvu',
-        transaction_type: 'send',
-        counterparty_transaction_id: '36497',
-        counterparty_transaction_type: 'cvu-external',
-        datetime: '2024-05-28 19:22:07',
-        related_transaction_id: null,
-        cvu_stellar_transaction_id: null,
-        is_consolidated: '0',
-        user_id: '3453',
-        status: 'IN_BIND_PROGRESS',
-        uitoken: '26eee08b-5482-48d4-b971-3ac7a4b2280f',
-        related_payment_request_payment_id: null,
-      },
-      {
-        transaction_id: '66473',
-        account_transaction_id: '63970',
-        account_transaction_type: 'cvu',
-        transaction_type: 'send',
-        counterparty_transaction_id: '36496',
-        counterparty_transaction_type: 'cvu-external',
-        datetime: '2024-05-28 19:22:03',
-        related_transaction_id: null,
-        cvu_stellar_transaction_id: null,
-        is_consolidated: '0',
-        user_id: '3453',
-        status: 'IN_BIND_PROGRESS',
-        uitoken: '72378539-6241-4483-a238-5bb1ae1cdfc1',
-        related_payment_request_payment_id: null,
-      },
-      {
-        transaction_id: '66472',
-        account_transaction_id: '63969',
-        account_transaction_type: 'cvu',
-        transaction_type: 'send',
-        counterparty_transaction_id: '36495',
-        counterparty_transaction_type: 'cvu-external',
-        datetime: '2024-05-28 19:21:51',
-        related_transaction_id: null,
-        cvu_stellar_transaction_id: null,
-        is_consolidated: '0',
-        user_id: '3453',
-        status: 'IN_BIND_PROGRESS',
-        uitoken: 'd90a5a1e-21a1-46a4-a51b-b8801030d85d',
-        related_payment_request_payment_id: null,
-      },
-    ];
-    const url: string = `${this.URL}/banks/${this.BANK_ID}/accounts/${this.ACCOUNT_ID}/${this.VIEW_ID}/transaction-request-types/TRANSFER-CVU`;
-    try {
-      const headers = {
-        Authorization: `JWT ${await this.bindService.getToken()}`,
-      };
-      const response = await axios.get(
-        url,
-        {
+    });
+    const headers = {
+      Authorization: `JWT ${await this.bindService.getToken()}`,
+    };
+    for (const transaction of dataTransactions) {
+      const url: string = `${this.URL}/banks/${this.BANK_ID}/accounts/${this.ACCOUNT_ID}/${this.VIEW_ID}/transaction-request-types/TRANSFER/${transaction.transaction_id}`;
+      const response = await axios
+        .get(url, {
           headers,
-        },
-      );
+        })
+        .then((response) => response.data)
+        .catch((error) => error.response.data);
 
-      return response.data;
-    } catch (error) {
-      throw new Error(error?.response?.data?.message);
+      if (response.code) {
+        transactions.push({
+          idTransactiosn: transaction.id,
+          status: transaction.status,
+          message: response.message,
+        });
+      } else {
+        //verificar si lo dejamos o lo quitamos
+        //esto es para actualizar
+        // if (transaction.status !== response.status) {
+        //   await this._transacctionRepository.update(transaction.id, {
+        //     status: response.status
+        //   });
+        // }
+        transactions.push({
+          idTransactiosn: transaction.transaction_id,
+          status: transaction.status,
+          message: '',
+        });
+      }
+      return transactions;
     }
   }
 

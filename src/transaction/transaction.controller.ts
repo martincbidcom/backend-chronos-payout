@@ -4,6 +4,7 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  Logger,
   Post,
 } from '@nestjs/common';
 import { BindService } from 'src/bind/bind.service';
@@ -14,6 +15,7 @@ import {
 import { TransactionService } from './transaction.service';
 import { ApiTags } from '@nestjs/swagger';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { ScheduleConfigurationService } from 'src/schedule-configuration/schedule-configuration.service';
 
 @ApiTags('Transaction')
 @Controller('transaction')
@@ -21,6 +23,7 @@ export class TransactionController {
   constructor(
     private bindService: BindService,
     private transactionService: TransactionService,
+    private scheduleConfigurationService: ScheduleConfigurationService,
   ) {}
 
   @Get('token')
@@ -52,8 +55,13 @@ export class TransactionController {
   }
 
   @Get('get-transaction')
-  @Cron(CronExpression.EVERY_10_HOURS)
+  // @Cron(CronExpression.EVERY_MINUTE)
   async getPendingTransactions() {
+    const cron =
+      await this.scheduleConfigurationService.getScheduleConfiguration(
+        'transacciones pendientes',
+      );
+    if (!cron.status) return true;
     try {
       return {
         statusCode: HttpStatus.ACCEPTED,

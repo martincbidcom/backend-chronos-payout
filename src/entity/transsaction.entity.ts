@@ -6,9 +6,12 @@ import {
 } from 'typeorm';
 
 @Entity({ name: 'transactions' })
-export class Transacction {
+export class Transacctions {
   @PrimaryGeneratedColumn()
   id?: string;
+
+  @Column()
+  transaction_id?: string;
 
   @Column('decimal', { precision: 20, scale: 10, default: 0 })
   amountFiat: number;
@@ -42,8 +45,4 @@ export class Transacction {
 
   @Column({ default: 'cvu' })
   account_transaction_type?: string;
-
-  constructor(partial: Partial<Transacction>) {
-    Object.assign(this, partial);
-  }
 }
