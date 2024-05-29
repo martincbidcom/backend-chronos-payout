@@ -4,8 +4,7 @@ import { readFileSync } from 'fs';
 import * as https from 'https';
 import { DoRequestDto } from 'src/common/dto/bind.dto';
 import { BindRequestInterface } from 'src/common/interfaces/bind.interface';
-import { ProcessLog } from 'src/common/utils/enum';
-import { TempLogService } from 'src/temp-log/temp-log.service';
+import { CoinsFiat, ConceptBind } from 'src/common/utils/enum';
 
 @Injectable()
 export class BindService {
@@ -17,7 +16,7 @@ export class BindService {
     private ACCOUNT_ID = process.env.ACCOUNT_ID_BIND;
     private VIEW_ID = process.env.VIEW_ID_BIND;
 
-    constructor(private tempLogService: TempLogService) { }
+    constructor() { }
 
     async requestLogin() {
         try {
@@ -53,15 +52,7 @@ export class BindService {
 
             return response.data.token;
         } catch (error) {
-            await this.tempLogService.saveTempLog({
-                process: ProcessLog.BIND,
-                method: 'requestLogin => Obtencion de token',
-                description:
-                    'Error en la optencion de token' +
-                    JSON.stringify(error?.response?.data ?? error?.response),
-            });
-
-            throw new Error('Error en autenticacion de BIND.');
+            throw new Error(error?.response?.data?.message);
         }
     }
 
@@ -71,11 +62,6 @@ export class BindService {
         const oneMinuteInMillis = 60 * 1000;
 
         if (expirationTime - currentTime <= oneMinuteInMillis) {
-            await this.tempLogService.saveTempLog({
-                process: ProcessLog.BIND,
-                method: 'checkTokenAndReconnect => tiempo de expiracion ',
-                description: 'token Vencido',
-            });
             await this.requestLogin();
         }
     }
@@ -102,18 +88,19 @@ export class BindService {
             const { destinationCbu, amount } = body;
 
             const params: BindRequestInterface = {
-                to: {
-                    cbu: destinationCbu,
-                },
-                value: {
-                    currency: 'ARS',
-                    amount: amount.toFixed(2),
-                },
-                concept: 'VAR',
-                origin_id: await this.generateBindTransactionOriginID(body.idTransaction),
+                origin_id: String(body.idTransaction),
                 origin_debit: {
                     cvu: process.env.CVU_DEBITO_BIND,
                 },
+                value: {
+                    currency: CoinsFiat.ARS,
+                    amount: Number(amount).toFixed(2),
+                },
+                to: {
+                    cbu: destinationCbu,
+                },
+                concept: ConceptBind.VAR,
+                description: "Pago Alfred",
             };
 
             const headers = {
@@ -132,19 +119,8 @@ export class BindService {
 
             return response.data;
         } catch (error) {
-            await this.tempLogService.saveTempLog({
-                process: ProcessLog.BIND,
-                method: 'doTransaction => generar transaccion',
-                description:
-                    'Error al generar transaccion' +
-                    JSON.stringify(error?.response?.data ?? error?.response),
-            });
-            throw new Error('Error en aplicar la transacción al BIND.');
+            throw new Error(error?.response?.data?.message);
         }
-    }
-
-    async generateBindTransactionOriginID(transactionId: string | number) {
-        return `CHR${transactionId.toString().padStart(10, '0')}`;
     }
 
     async getTransaction(){
@@ -155,6 +131,40 @@ export class BindService {
             const response = await axios.get(`${this.URL}/banks/${this.BANK_ID}/accounts/${this.ACCOUNT_ID}/${this.VIEW_ID}/transaction-request-types/TRANSFER-CVU`, {
                 headers
             })
+
+            return response.data
+        } catch (error) {
+            throw new Error(error?.response?.data?.message)
+        }
+    }
+
+    async getTransactionByID(id: string){
+        try {
+            const headers = {
+                Authorization: `JWT ${await this.getToken()}`
+            }
+            const response = await axios.get(`${this.URL}/banks/${this.BANK_ID}/accounts/${this.ACCOUNT_ID}/${this.VIEW_ID}/transaction-request-types/TRANSFER-CVU/${id}`, {
+                headers
+            })
+
+            return response.data
+        } catch (error) {
+            throw new Error(error?.response?.data?.message)
+        }
+    }
+
+    async getAccount(cvu:string){
+        try {
+            const headers = {
+                Authorization: `JWT ${await this.getToken()}`
+            }
+            const response = await axios.get(`${this.URL}/accounts/cbu/${cvu}`, {
+                headers
+            })
+
+            if (response.data.owners.length === 0) {
+                throw new Error('CVU invalida para operar.')
+              }
 
             return response.data
         } catch (error) {

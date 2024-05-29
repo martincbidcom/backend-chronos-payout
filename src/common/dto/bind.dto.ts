@@ -8,12 +8,12 @@ export class DoRequestDto {
   destinationCbu: string;
 
   @ApiProperty()
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  amount: number;
+  amount: string;
 
   @ApiProperty()
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  idTransaction: number;
+  idTransaction: string;
 }
