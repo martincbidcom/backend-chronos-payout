@@ -61,7 +61,9 @@ export class TransactionController {
       await this.scheduleConfigurationService.getScheduleConfiguration(
         'transacciones pendientes',
       );
+
     if (!cron.status) return true;
+
     try {
       return {
         statusCode: HttpStatus.ACCEPTED,
