@@ -17,6 +17,10 @@ import { CounterpartyCbuTransactionsEntity } from 'src/entity/counterparty_cbu_t
 
 @Injectable()
 export class TransactionService {
+  private URL = process.env.URL_BIND;
+  private BANK_ID = process.env.BANK_ID_BIND;
+  private ACCOUNT_ID = process.env.ACCOUNT_ID_BIND;
+  private VIEW_ID = process.env.VIEW_ID_BIND;
   constructor(
     @InjectRepository(Transacction)
     private _transacctionRepository: Repository<Transacction>,
@@ -56,7 +60,6 @@ export class TransactionService {
     return await this._transacctionRepository.update({ id }, obj);
   }
 
-  
   /**
    * @method getPendingTransactions
    * Recupera todas las transacciones pendientes de la base de datos que tengan un estado 'IN_PROGRESS', 'IN_BIND_PROGRESS', o 'BIND_COMPLETED' y un tipo de transacción de cuenta 'cvu'
@@ -74,136 +77,137 @@ export class TransactionService {
         type: 'cvu',
       })
       .getRawMany();
-    // data = [
-    //   {
-    //     transaction_id: '66479',
-    //     account_transaction_id: '63976',
-    //     account_transaction_type: 'cvu',
-    //     transaction_type: 'send',
-    //     counterparty_transaction_id: '36502',
-    //     counterparty_transaction_type: 'cvu-external',
-    //     datetime: '2024-05-28 19:22:42',
-    //     related_transaction_id: null,
-    //     cvu_stellar_transaction_id: null,
-    //     is_consolidated: '0',
-    //     user_id: '3453',
-    //     status: 'IN_PROGRESS',
-    //     uitoken: 'd3b74c8d-4100-4cb1-b701-fb45c4aec2f2',
-    //     related_payment_request_payment_id: null,
-    //   },
-    //   {
-    //     transaction_id: '66478',
-    //     account_transaction_id: '63975',
-    //     account_transaction_type: 'cvu',
-    //     transaction_type: 'send',
-    //     counterparty_transaction_id: '36501',
-    //     counterparty_transaction_type: 'cvu-external',
-    //     datetime: '2024-05-28 19:22:36',
-    //     related_transaction_id: null,
-    //     cvu_stellar_transaction_id: null,
-    //     is_consolidated: '0',
-    //     user_id: '3453',
-    //     status: 'IN_BIND_PROGRESS',
-    //     uitoken: 'd464bc98-20aa-48d0-8b95-4ef824c9680b',
-    //     related_payment_request_payment_id: null,
-    //   },
-    //   {
-    //     transaction_id: '66477',
-    //     account_transaction_id: '63974',
-    //     account_transaction_type: 'cvu',
-    //     transaction_type: 'send',
-    //     counterparty_transaction_id: '36500',
-    //     counterparty_transaction_type: 'cvu-external',
-    //     datetime: '2024-05-28 19:22:29',
-    //     related_transaction_id: null,
-    //     cvu_stellar_transaction_id: null,
-    //     is_consolidated: '0',
-    //     user_id: '3453',
-    //     status: 'IN_BIND_PROGRESS',
-    //     uitoken: 'ff277d0a-f616-4e18-837a-ce79be7f5c20',
-    //     related_payment_request_payment_id: null,
-    //   },
-    //   {
-    //     transaction_id: '66476',
-    //     account_transaction_id: '63973',
-    //     account_transaction_type: 'cvu',
-    //     transaction_type: 'send',
-    //     counterparty_transaction_id: '36499',
-    //     counterparty_transaction_type: 'cvu-external',
-    //     datetime: '2024-05-28 19:22:21',
-    //     related_transaction_id: null,
-    //     cvu_stellar_transaction_id: null,
-    //     is_consolidated: '0',
-    //     user_id: '3453',
-    //     status: 'IN_BIND_PROGRESS',
-    //     uitoken: '7ef810db-6099-4c6f-819e-d14dbdd62f5f',
-    //     related_payment_request_payment_id: null,
-    //   },
-    //   {
-    //     transaction_id: '66475',
-    //     account_transaction_id: '63972',
-    //     account_transaction_type: 'cvu',
-    //     transaction_type: 'send',
-    //     counterparty_transaction_id: '36498',
-    //     counterparty_transaction_type: 'cvu-external',
-    //     datetime: '2024-05-28 19:22:13',
-    //     related_transaction_id: null,
-    //     cvu_stellar_transaction_id: null,
-    //     is_consolidated: '0',
-    //     user_id: '3453',
-    //     status: 'IN_BIND_PROGRESS',
-    //     uitoken: '1003e995-0d40-446e-b6d7-82c1070f91bd',
-    //     related_payment_request_payment_id: null,
-    //   },
-    //   {
-    //     transaction_id: '66474',
-    //     account_transaction_id: '63971',
-    //     account_transaction_type: 'cvu',
-    //     transaction_type: 'send',
-    //     counterparty_transaction_id: '36497',
-    //     counterparty_transaction_type: 'cvu-external',
-    //     datetime: '2024-05-28 19:22:07',
-    //     related_transaction_id: null,
-    //     cvu_stellar_transaction_id: null,
-    //     is_consolidated: '0',
-    //     user_id: '3453',
-    //     status: 'IN_BIND_PROGRESS',
-    //     uitoken: '26eee08b-5482-48d4-b971-3ac7a4b2280f',
-    //     related_payment_request_payment_id: null,
-    //   },
-    //   {
-    //     transaction_id: '66473',
-    //     account_transaction_id: '63970',
-    //     account_transaction_type: 'cvu',
-    //     transaction_type: 'send',
-    //     counterparty_transaction_id: '36496',
-    //     counterparty_transaction_type: 'cvu-external',
-    //     datetime: '2024-05-28 19:22:03',
-    //     related_transaction_id: null,
-    //     cvu_stellar_transaction_id: null,
-    //     is_consolidated: '0',
-    //     user_id: '3453',
-    //     status: 'IN_BIND_PROGRESS',
-    //     uitoken: '72378539-6241-4483-a238-5bb1ae1cdfc1',
-    //     related_payment_request_payment_id: null,
-    //   },
-    //   {
-    //     transaction_id: '66472',
-    //     account_transaction_id: '63969',
-    //     account_transaction_type: 'cvu',
-    //     transaction_type: 'send',
-    //     counterparty_transaction_id: '36495',
-    //     counterparty_transaction_type: 'cvu-external',
-    //     datetime: '2024-05-28 19:21:51',
-    //     related_transaction_id: null,
-    //     cvu_stellar_transaction_id: null,
-    //     is_consolidated: '0',
-    //     user_id: '3453',
-    //     status: 'IN_BIND_PROGRESS',
-    //     uitoken: 'd90a5a1e-21a1-46a4-a51b-b8801030d85d',
-    //     related_payment_request_payment_id: null,
-    //   },
-    // ];
+    data = [
+      {
+        transaction_id: '66479',
+        account_transaction_id: '63976',
+        account_transaction_type: 'cvu',
+        transaction_type: 'send',
+        counterparty_transaction_id: '36502',
+        counterparty_transaction_type: 'cvu-external',
+        datetime: '2024-05-28 19:22:42',
+        related_transaction_id: null,
+        cvu_stellar_transaction_id: null,
+        is_consolidated: '0',
+        user_id: '3453',
+        status: 'IN_PROGRESS',
+        uitoken: 'd3b74c8d-4100-4cb1-b701-fb45c4aec2f2',
+        related_payment_request_payment_id: null,
+      },
+      {
+        transaction_id: '66478',
+        account_transaction_id: '63975',
+        account_transaction_type: 'cvu',
+        transaction_type: 'send',
+        counterparty_transaction_id: '36501',
+        counterparty_transaction_type: 'cvu-external',
+        datetime: '2024-05-28 19:22:36',
+        related_transaction_id: null,
+        cvu_stellar_transaction_id: null,
+        is_consolidated: '0',
+        user_id: '3453',
+        status: 'IN_BIND_PROGRESS',
+        uitoken: 'd464bc98-20aa-48d0-8b95-4ef824c9680b',
+        related_payment_request_payment_id: null,
+      },
+      {
+        transaction_id: '66477',
+        account_transaction_id: '63974',
+        account_transaction_type: 'cvu',
+        transaction_type: 'send',
+        counterparty_transaction_id: '36500',
+        counterparty_transaction_type: 'cvu-external',
+        datetime: '2024-05-28 19:22:29',
+        related_transaction_id: null,
+        cvu_stellar_transaction_id: null,
+        is_consolidated: '0',
+        user_id: '3453',
+        status: 'IN_BIND_PROGRESS',
+        uitoken: 'ff277d0a-f616-4e18-837a-ce79be7f5c20',
+        related_payment_request_payment_id: null,
+      },
+      {
+        transaction_id: '66476',
+        account_transaction_id: '63973',
+        account_transaction_type: 'cvu',
+        transaction_type: 'send',
+        counterparty_transaction_id: '36499',
+        counterparty_transaction_type: 'cvu-external',
+        datetime: '2024-05-28 19:22:21',
+        related_transaction_id: null,
+        cvu_stellar_transaction_id: null,
+        is_consolidated: '0',
+        user_id: '3453',
+        status: 'IN_BIND_PROGRESS',
+        uitoken: '7ef810db-6099-4c6f-819e-d14dbdd62f5f',
+        related_payment_request_payment_id: null,
+      },
+      {
+        transaction_id: '66475',
+        account_transaction_id: '63972',
+        account_transaction_type: 'cvu',
+        transaction_type: 'send',
+        counterparty_transaction_id: '36498',
+        counterparty_transaction_type: 'cvu-external',
+        datetime: '2024-05-28 19:22:13',
+        related_transaction_id: null,
+        cvu_stellar_transaction_id: null,
+        is_consolidated: '0',
+        user_id: '3453',
+        status: 'IN_BIND_PROGRESS',
+        uitoken: '1003e995-0d40-446e-b6d7-82c1070f91bd',
+        related_payment_request_payment_id: null,
+      },
+      {
+        transaction_id: '66474',
+        account_transaction_id: '63971',
+        account_transaction_type: 'cvu',
+        transaction_type: 'send',
+        counterparty_transaction_id: '36497',
+        counterparty_transaction_type: 'cvu-external',
+        datetime: '2024-05-28 19:22:07',
+        related_transaction_id: null,
+        cvu_stellar_transaction_id: null,
+        is_consolidated: '0',
+        user_id: '3453',
+        status: 'IN_BIND_PROGRESS',
+        uitoken: '26eee08b-5482-48d4-b971-3ac7a4b2280f',
+        related_payment_request_payment_id: null,
+      },
+      {
+        transaction_id: '66473',
+        account_transaction_id: '63970',
+        account_transaction_type: 'cvu',
+        transaction_type: 'send',
+        counterparty_transaction_id: '36496',
+        counterparty_transaction_type: 'cvu-external',
+        datetime: '2024-05-28 19:22:03',
+        related_transaction_id: null,
+        cvu_stellar_transaction_id: null,
+        is_consolidated: '0',
+        user_id: '3453',
+        status: 'IN_BIND_PROGRESS',
+        uitoken: '72378539-6241-4483-a238-5bb1ae1cdfc1',
+        related_payment_request_payment_id: null,
+      },
+      {
+        transaction_id: '66472',
+        account_transaction_id: '63969',
+        account_transaction_type: 'cvu',
+        transaction_type: 'send',
+        counterparty_transaction_id: '36495',
+        counterparty_transaction_type: 'cvu-external',
+        datetime: '2024-05-28 19:21:51',
+        related_transaction_id: null,
+        cvu_stellar_transaction_id: null,
+        is_consolidated: '0',
+        user_id: '3453',
+        status: 'IN_BIND_PROGRESS',
+        uitoken: 'd90a5a1e-21a1-46a4-a51b-b8801030d85d',
+        related_payment_request_payment_id: null,
+      },
+    ];
+    const url: string = `${this.URL}/banks/${this.BANK_ID}/accounts/${this.ACCOUNT_ID}/${this.VIEW_ID}/transaction-request-types/TRANSFER-CVU/transaction-requests`;
 
     for (const transaction of data) {
       transactions.push(await this.getFullTransactionFromId(transaction));
@@ -335,11 +339,16 @@ export class TransactionService {
         await this.getTransactionCounterpartyCBUForTransactionId(
           transaction.counterparty_transaction_id,
         );
-      counterparty_account = { cbu_cvu: counterparty_transaction ? counterparty_transaction.cbu_cvu: '' };
+      counterparty_account = {
+        cbu_cvu: counterparty_transaction
+          ? counterparty_transaction.cbu_cvu
+          : '',
+      };
     }
     description = transaction.transaction_type;
-    if(source_transaction)source_transaction.account = source_account;
-    if(counterparty_transaction)counterparty_transaction.account = counterparty_account;
+    if (source_transaction) source_transaction.account = source_account;
+    if (counterparty_transaction)
+      counterparty_transaction.account = counterparty_account;
     transaction.related_transaction_id = transaction.related_transaction_id;
     transaction.source_transaction = source_transaction;
     transaction.counterparty_transaction = counterparty_transaction;
@@ -395,7 +404,9 @@ export class TransactionService {
         await this.getTransactionForCVUTransactionId(
           transaction.account_transaction_id,
         );
-      transaction.cbu = { chronos_transaction: cvuAccountTransaction ? cvuAccountTransaction: '' };
+      transaction.cbu = {
+        chronos_transaction: cvuAccountTransaction ? cvuAccountTransaction : '',
+      };
       if (cvuAccountTransaction) {
         const bindCVUTransaction = await this.getBINDCVUAccountTransaction(
           cvuAccountTransaction.bind_transaction_id,
