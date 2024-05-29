@@ -207,8 +207,8 @@ export class TransactionService {
         related_payment_request_payment_id: null,
       },
     ];
-    const url: string = `${this.URL}/banks/${this.BANK_ID}/accounts/${this.ACCOUNT_ID}/${this.VIEW_ID}/transaction-request-types/TRANSFER-CVU/transaction-requests`;
-
+    const url: string = `${this.URL}/banks/${this.BANK_ID}/accounts/${this.ACCOUNT_ID}/${this.VIEW_ID}/transaction-request-types/TRANSFER-CVU`;
+    
     for (const transaction of data) {
       transactions.push(await this.getFullTransactionFromId(transaction));
     }
