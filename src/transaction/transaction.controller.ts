@@ -63,6 +63,7 @@ export class TransactionController {
       );
 
     if (!cron.status) return true;
+
     try {
       return {
         statusCode: HttpStatus.ACCEPTED,
