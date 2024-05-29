@@ -87,6 +87,8 @@ export class BindService {
         try {
             const { destinationCbu, amount } = body;
 
+            await this.getAccount(destinationCbu)
+
             const params: BindRequestInterface = {
                 origin_id: String(body.idTransaction),
                 origin_debit: {
@@ -162,9 +164,7 @@ export class BindService {
                 headers
             })
 
-            if (response.data.owners.length === 0) {
-                throw new Error('CVU invalida para operar.')
-              }
+            if (response.data.owners.length === 0) throw new Error('CVU invalida para operar.')
 
             return response.data
         } catch (error) {
